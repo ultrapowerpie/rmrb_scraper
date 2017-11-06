@@ -111,7 +111,7 @@ class Scraper(object):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        with open(directory + '/' + filename + '.txt', 'w') as f:
+        with open(directory + '/' + filename + '.txt', 'wb') as f:
             f.write(text.encode('utf-8'))
 
     def go_to_next_page(self):
