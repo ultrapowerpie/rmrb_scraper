@@ -22,7 +22,9 @@ class Scraper(object):
     def __init__(self):
         parser = argparse.ArgumentParser(description='Process some integers.')
 
-        parser.add_argument('--checkpoint', default='1600', type=int,
+        parser.add_argument('--folder', default='webpages', type=str,
+            help='the folder to write downloaded pages to (default: webpages)')
+        parser.add_argument('--checkpoint', default='0', type=int,
            help='the last completed page of search results saved (default: 0)')
         parser.add_argument('--headless', action='store_true',
            help='whether to run Chrome in headless mode (default: True)')
@@ -39,24 +41,28 @@ class Scraper(object):
         self.driver.get('http://rmrb.egreenapple.com/index2.html')
         self.driver.switch_to_frame('main')
 
-        self.driver.find_element_by_css_selector('input').send_keys('1987 to 2012')
+        self.driver.find_element_by_css_selector('input').send_keys('1989 to 2012')
         self.driver.find_element_by_id('image1').click()
 
+        self.folder = args.folder
         self.checkpoint = args.checkpoint
         self.iterator = range(7,85,4)
-        self.pages = 0
+        self.pages = 1
 
-    def scrape_pages(self, folder):
+    def scrape_pages(self):
         while self.checkpoint - self.pages > 14:
             self.skip_pages()
+            print("search pages skipped: ", self.pages)
             time.sleep(.100)
 
         while self.pages < self.checkpoint:
             self.go_to_next_page()
+            print("search pages skipped: ", self.pages)
             time.sleep(.100)
 
-        while self.pages < 47652:
-            self.save_pages(folder,  85)
+        while self.pages < 44237:
+            self.save_pages(85)
+            print("search pages saved: ", self.pages)
             self.go_to_next_page()
 
         self.save_pages(61)
@@ -64,7 +70,7 @@ class Scraper(object):
         self.driver.quit()
         sys.exit()
 
-    def save_pages(self, folder, numel):
+    def save_pages(self, numel):
         i = 0
         while i+1 < len(self.iterator):
             try:
@@ -82,10 +88,7 @@ class Scraper(object):
                     fonts = self.driver.find_elements_by_css_selector('font')
                     date = paragraphs[2].text
 
-                    if '1987' in date:
-                        continue
-
-                    directory = self.get_directory(folder, date)
+                    directory = self.get_directory(date)
                     filename = paragraphs[1].text
                     text = fonts[10].text
 
@@ -99,16 +102,16 @@ class Scraper(object):
                 self.driver.quit()
                 sys.exit()
 
-    def get_directory(self, folder, date):
+    def get_directory(self, date):
         regex = re.compile('[^0-9]+')
         _, year, month, day, _ = regex.split(date)
-        return '/'.join([folder,year,month,day])
+        return '/'.join([self.folder,year,month,day])
 
     def write_file(self, directory, filename, text):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        with open(directory + '/' + filename, 'w') as f:
+        with open(directory + '/' + filename + '.txt', 'w') as f:
             f.write(text)
 
     def go_to_next_page(self):
@@ -119,7 +122,7 @@ class Scraper(object):
             next_page = imgs[3]
             next_page.click()
             self.pages += 1
-            print("search pages saved: ", self.pages)
+
         except:
             self.driver.quit()
             sys.exit()
@@ -131,12 +134,10 @@ class Scraper(object):
             )
             button.click()
             self.pages += 15
-            print("search pages skipped: ", self.pages)
         except:
             self.driver.quit()
             sys.exit()
 
 if __name__ == '__main__':
-    folder = 'webpages'
     s = Scraper()
-    s.scrape_pages(folder)
+    s.scrape_pages()
