@@ -112,7 +112,7 @@ class Scraper(object):
             os.makedirs(directory)
 
         with open(directory + '/' + filename + '.txt', 'w') as f:
-            f.write(text)
+            f.write(text.encode('utf-8'))
 
     def go_to_next_page(self):
         try:
