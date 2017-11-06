@@ -89,7 +89,7 @@ class Scraper(object):
 
             except:
                 self.driver.quit()
-                sys.exit()
+                return
 
     def get_directory(self, date):
         regex = re.compile('[^0-9]+')
@@ -118,7 +118,7 @@ class Scraper(object):
 
         except:
             self.driver.quit()
-            sys.exit()
+            return
 
     def skip_pages(self):
         try:
@@ -129,7 +129,7 @@ class Scraper(object):
             self.pages += 15
         except:
             self.driver.quit()
-            sys.exit()
+            return
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Scrape articles from rmrb.')
