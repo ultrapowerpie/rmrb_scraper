@@ -77,26 +77,27 @@ class Scraper(object):
                 links = WebDriverWait(self.driver, 10).until(
                     number_of_elements_at_least((By.CSS_SELECTOR, 'td'), numel)
                 )
-                links[self.iterator[i]].find_element_by_css_selector('a').click()
+                link = links[self.iterator[i]].find_element_by_css_selector('a')
                 i += 1
+                if link.is_displayed():
+                    try:
+                        link.click()
+                        WebDriverWait(self.driver, 10).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, '[href="javascript:GoToPDF()"]'))
+                        )
+                        paragraphs = self.driver.find_elements_by_css_selector('p')
+                        fonts = self.driver.find_elements_by_css_selector('font')
+                        date = paragraphs[2].text
 
-                try:
-                    WebDriverWait(self.driver, 10).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, '[href="javascript:GoToPDF()"]'))
-                    )
-                    paragraphs = self.driver.find_elements_by_css_selector('p')
-                    fonts = self.driver.find_elements_by_css_selector('font')
-                    date = paragraphs[2].text
+                        directory = self.get_directory(date)
+                        filename = paragraphs[1].text
+                        text = fonts[10].text
 
-                    directory = self.get_directory(date)
-                    filename = paragraphs[1].text
-                    text = fonts[10].text
+                        self.write_file(directory, filename, text)
 
-                    self.write_file(directory, filename, text)
-
-                finally:
-                    self.driver.back()
-                    self.driver.switch_to_frame('main')
+                    finally:
+                        self.driver.back()
+                        self.driver.switch_to_frame('main')
 
             except:
                 self.driver.quit()
