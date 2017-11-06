@@ -55,7 +55,7 @@ class Scraper(object):
             print("search pages skipped: ", self.pages)
             time.sleep(.100)
 
-        while self.pages < self.checkpoint:
+        while self.pages <= self.checkpoint:
             self.go_to_next_page()
             print("search pages skipped: ", self.pages)
             time.sleep(.100)
