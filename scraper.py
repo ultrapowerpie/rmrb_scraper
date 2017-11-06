@@ -19,21 +19,16 @@ class number_of_elements_at_least(object):
 
 class Scraper(object):
 
-    def __init__(self):
-        parser = argparse.ArgumentParser(description='Process some integers.')
-
-        parser.add_argument('--folder', default='webpages', type=str,
-            help='the folder to write downloaded pages to (default: webpages)')
-        parser.add_argument('--checkpoint', default='0', type=int,
-           help='the last completed page of search results saved (default: 0)')
-        parser.add_argument('--headless', action='store_true',
-           help='whether to run Chrome in headless mode (default: True)')
-
-        args = parser.parse_args()
-
+    def __init__(self, headless=False, checkpoint=0, folder='webpages', query='1989 to 2012'):
         options = webdriver.ChromeOptions()
-        if args.headless:
+        if headless:
             options.add_argument('headless')
+
+        self.query = query
+        self.folder = folder
+        self.checkpoint = checkpoint
+        self.iterator = range(7,85,4)
+        self.pages = 1
 
         self.driver = webdriver.Chrome(chrome_options=options)
         self.driver.implicitly_wait(10)
@@ -41,31 +36,24 @@ class Scraper(object):
         self.driver.get('http://rmrb.egreenapple.com/index2.html')
         self.driver.switch_to_frame('main')
 
-        self.driver.find_element_by_css_selector('input').send_keys('1989 to 2012')
+        self.driver.find_element_by_css_selector('input').send_keys(self.query)
         self.driver.find_element_by_id('image1').click()
-
-        self.folder = args.folder
-        self.checkpoint = args.checkpoint
-        self.iterator = range(7,85,4)
-        self.pages = 1
 
     def scrape_pages(self):
         while self.checkpoint - self.pages > 14:
             self.skip_pages()
-            print("search pages skipped: ", self.pages)
             time.sleep(.100)
 
         while self.pages <= self.checkpoint:
             self.go_to_next_page()
-            print("search pages skipped: ", self.pages)
             time.sleep(.100)
 
-        while self.pages < 44237:
+        while True:
             self.save_pages(85)
-            print("search pages saved: ", self.pages)
+            self.write_checkpoint()
             self.go_to_next_page()
 
-        self.save_pages(61)
+        self.save_pages(7)
 
         self.driver.quit()
         sys.exit()
@@ -108,6 +96,10 @@ class Scraper(object):
         _, year, month, day, _ = regex.split(date)
         return '/'.join([self.folder,year,month,day])
 
+    def write_checkpoint(self):
+        with open(str(self.query) + '.txt', 'wb') as f:
+            f.write((str(self.pages)).encode('utf-8'))
+
     def write_file(self, directory, filename, text):
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -140,5 +132,18 @@ class Scraper(object):
             sys.exit()
 
 if __name__ == '__main__':
-    s = Scraper()
+    parser = argparse.ArgumentParser(description='Scrape articles from rmrb.')
+
+    parser.add_argument('--query', default='1989 to 2012', type=str,
+        help='the date range to scrape (default: 1989 to 2012)' )
+    parser.add_argument('--folder', default='webpages', type=str,
+        help='the folder to write downloaded pages to (default: webpages)')
+    parser.add_argument('--checkpoint', default='0', type=int,
+        help='the last completed page of search results saved (default: 0)')
+    parser.add_argument('--headless', action='store_true',
+        help='whether to run Chrome in headless mode (default: True)')
+
+    args = parser.parse_args()
+
+    s = Scraper(headless=args.headless, checkpoint=args.checkpoint, folder=args.folder, query=args.query)
     s.scrape_pages()
