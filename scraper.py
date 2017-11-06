@@ -46,12 +46,12 @@ class Scraper(Thread):
         while self.checkpoint - self.pages > 14:
             if not self.skip_pages():
                 return
-            time.sleep(.100)
+            time.sleep(.200)
 
         while self.pages <= self.checkpoint:
             if not self.go_to_next_page():
                 return
-            time.sleep(.100)
+            time.sleep(.200)
 
         while self.save_pages(7):
             self.write_checkpoint()
