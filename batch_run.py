@@ -1,15 +1,13 @@
 #!/usr/bin/env python
 from scraper import Scraper
+from concurrent.futures import ThreadPoolExecutor
 
-import concurrent.futures.ThreadPoolExecutor
 import argparse, os
 
 parser = argparse.ArgumentParser(description='Scrape articles from rmrb.')
 
 parser.add_argument('--folder', default='webpages', type=str,
     help='the folder to write downloaded pages to (default: webpages)')
-parser.add_argument('--checkpoint', default='0', type=int,
-    help='the last completed page of search results saved (default: 0)')
 parser.add_argument('--headless', action='store_true',
     help='whether to run Chrome in headless mode (default: True)')
 parser.add_argument('--maxthreads', default='4', type=int,
@@ -30,6 +28,8 @@ for year in range(1989, 2013):
     with open(filename, 'rb') as f:
         checkpoint = int(f.readline())
 
-    s = Scraper(headless=args.headless, checkpoint=checkpoint, folder=args.folder, query=year)
+    s = executor.submit(
+        Scraper(headless=args.headless, checkpoint=checkpoint, folder=args.folder, query=year)
+    )
     scrapers.append(s)
     executor.submit(s.scrape_pages)
