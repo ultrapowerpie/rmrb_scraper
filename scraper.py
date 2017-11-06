@@ -96,6 +96,7 @@ class Scraper(object):
 
                 finally:
                     self.driver.back()
+                    self.driver.switch_to_frame('main')
 
             except:
                 self.driver.quit()
