@@ -79,7 +79,7 @@ class Scraper(object):
                 )
                 link = links[self.iterator[i]].find_element_by_css_selector('a')
                 i += 1
-                if link.is_displayed():
+                if link.text:
                     try:
                         link.click()
                         WebDriverWait(self.driver, 10).until(
