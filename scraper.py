@@ -140,23 +140,3 @@ class Scraper(Thread):
             return False
 
         return True
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Scrape articles from rmrb.')
-
-    parser.add_argument('--time', default='1989 to 2012', type=str,
-        help='the date range to scrape (default: 1989 to 2012)' )
-    parser.add_argument('--query', default='南朝鲜 + 韩国 + 日本 + 台湾', type=str,
-        help='the keyword query to search for (default: 南朝鲜 + 韩国 + 日本 + 台湾)')
-    parser.add_argument('--folder', default='webpages', type=str,
-        help='the folder to write downloaded pages to (default: webpages)')
-    parser.add_argument('--checkpoint', default='0', type=int,
-        help='the last completed page of search results saved (default: 0)')
-    parser.add_argument('--headless', action='store_true',
-        help='whether to run Chrome in headless mode (default: True)')
-
-    args = parser.parse_args()
-
-    s = Scraper(args.headless, args.checkpoint, args.folder, args.time, args.query)
-    s.start()
-    s.join()

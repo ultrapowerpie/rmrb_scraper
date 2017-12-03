@@ -13,13 +13,15 @@ parser.add_argument('--query', default='南朝鲜 + 韩国 + 日本 + 台湾', t
     help='the keyword query to search for (default: 南朝鲜 + 韩国 + 日本 + 台湾)')
 parser.add_argument('--maxworkers', default='1', type=int,
     help='maximum number of workers we can run at once (default: 1)')
+parser.add_argument('--wait', default='200', type=float,
+    help='milliseconds to wait for between requests')
 
 args = parser.parse_args()
 
 n = args.maxworkers
 
 scrapers = []
-years = range(1989, 2013)
+years = reversed(range(1989, 2013))
 blocks = []
 
 i = 0
@@ -39,7 +41,7 @@ for block in blocks:
             checkpoint = int(lines[-1])
 
         scrapers.append(
-            Scraper(args.headless, checkpoint, args.folder, year, args.query)
+            Scraper(args.headless, checkpoint, args.folder, year, args.query, wait=args.wait)
         )
 
     for s in scrapers:
