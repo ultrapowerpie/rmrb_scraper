@@ -20,14 +20,15 @@ class number_of_elements_at_least(object):
 
 class Scraper(Thread):
 
-    def __init__(self, headless=False, checkpoint=0, folder='webpages', query='1989 to 2012'):
+    def __init__(self, headless, checkpoint, folder, time, query):
         Thread.__init__(self)
 
         options = webdriver.ChromeOptions()
         if headless:
             options.add_argument('headless')
 
-        self.query = query
+        self.time = str(time)
+        self.query = str(query)
         self.folder = folder
         self.checkpoint = checkpoint
         self.iterator = range(7,85,4)
@@ -39,7 +40,9 @@ class Scraper(Thread):
         self.driver.get('http://rmrb.egreenapple.com/index2.html')
         self.driver.switch_to_frame('main')
 
-        self.driver.find_element_by_css_selector('input').send_keys(self.query)
+        inputs = self.driver.find_elements_by_css_selector('input')
+        inputs[0].send_keys(self.time)
+        inputs[6].send_keys(self.query)
         self.driver.find_element_by_id('image1').click()
 
     def run(self):
@@ -140,8 +143,10 @@ class Scraper(Thread):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Scrape articles from rmrb.')
 
-    parser.add_argument('--query', default='1989 to 2012', type=str,
+    parser.add_argument('--time', default='1989 to 2012', type=str,
         help='the date range to scrape (default: 1989 to 2012)' )
+    parser.add_argument('--query', default='南朝鲜 + 韩国 + 日本 + 台湾', type=str,
+        help='the keyword query to search for (default: 南朝鲜 + 韩国 + 日本 + 台湾)')
     parser.add_argument('--folder', default='webpages', type=str,
         help='the folder to write downloaded pages to (default: webpages)')
     parser.add_argument('--checkpoint', default='0', type=int,
@@ -151,6 +156,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    s = Scraper(headless=args.headless, checkpoint=args.checkpoint, folder=args.folder, query=args.query)
+    s = Scraper(args.headless, args.checkpoint, args.folder, args.time, args.query)
     s.start()
     s.join()

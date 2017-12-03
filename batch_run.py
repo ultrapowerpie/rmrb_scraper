@@ -8,9 +8,11 @@ parser = argparse.ArgumentParser(description='Scrape articles from rmrb.')
 parser.add_argument('--folder', default='webpages', type=str,
     help='the folder to write downloaded pages to (default: webpages)')
 parser.add_argument('--headless', action='store_true',
-    help='whether to run Chrome in headless mode (default: True)')
-parser.add_argument('--maxworkers', default='4', type=int,
-    help='maximum number of workers we can run at once (default: 4)')
+    help='whether to run Chrome in headless mode (default: False)')
+parser.add_argument('--query', default='南朝鲜 + 韩国 + 日本 + 台湾', type=str,
+    help='the keyword query to search for (default: 南朝鲜 + 韩国 + 日本 + 台湾)')
+parser.add_argument('--maxworkers', default='1', type=int,
+    help='maximum number of workers we can run at once (default: 1)')
 
 args = parser.parse_args()
 
@@ -37,7 +39,7 @@ for block in blocks:
             checkpoint = int(lines[-1])
 
         scrapers.append(
-            Scraper(headless=args.headless, checkpoint=checkpoint, folder=args.folder, query=year)
+            Scraper(args.headless, checkpoint, args.folder, year, args.query)
         )
 
     for s in scrapers:
