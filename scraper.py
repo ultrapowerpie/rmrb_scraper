@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from threading import Thread
-import argparse, re, os, sys, time
+import argparse, random, re, os, sys, time
 
 class number_of_elements_at_least(object):
   def __init__(self, locator, number):
@@ -20,7 +20,7 @@ class number_of_elements_at_least(object):
 
 class Scraper(Thread):
 
-    def __init__(self, headless, checkpoint, folder, time, query):
+    def __init__(self, headless, checkpoint, folder, time, query, wait=200):
         Thread.__init__(self)
 
         options = webdriver.ChromeOptions()
@@ -29,6 +29,7 @@ class Scraper(Thread):
 
         self.time = str(time)
         self.query = str(query)
+        self.wait = wait
         self.folder = folder
         self.checkpoint = checkpoint
         self.iterator = range(7,85,4)
@@ -49,12 +50,12 @@ class Scraper(Thread):
         while self.checkpoint - self.pages > 14:
             if not self.skip_pages():
                 return
-            time.sleep(.200)
+            time.sleep(self.wait*(1+random.random())/1000)
 
         while self.pages <= self.checkpoint:
             if not self.go_to_next_page():
                 return
-            time.sleep(.200)
+            time.sleep(self.wait*(1+random.random())/1000)
 
         while self.save_pages(7):
             self.write_checkpoint()
