@@ -46,16 +46,19 @@ class Scraper(Thread):
         inputs[6].send_keys(self.query)
         self.driver.find_element_by_id('image1').click()
 
+    def waitforit(self):
+        time.sleep(self.wait*(1+0.5*random.random())/1000)
+
     def run(self):
         while self.checkpoint - self.pages > 14:
             if not self.skip_pages():
                 return
-            time.sleep(self.wait*(1+random.random())/1000)
+            self.waitforit()
 
         while self.pages <= self.checkpoint:
             if not self.go_to_next_page():
                 return
-            time.sleep(self.wait*(1+random.random())/1000)
+            self.waitforit()
 
         while self.save_pages(7):
             self.write_checkpoint()
@@ -67,7 +70,7 @@ class Scraper(Thread):
     def save_pages(self, numel):
         i = 0
         while i < len(self.iterator):
-            time.sleep(self.wait*(1+random.random())/1000)
+            self.waitforit()
             try:
                 links = WebDriverWait(self.driver, 20).until(
                     number_of_elements_at_least((By.CSS_SELECTOR, 'td'), numel)
@@ -89,7 +92,7 @@ class Scraper(Thread):
 
                         self.write_file(directory, filename, text)
 
-                        time.sleep(self.wait*(1+random.random())/1000)
+                        self.waitforit()
                         self.driver.back()
                         self.driver.switch_to_frame('main')
 
