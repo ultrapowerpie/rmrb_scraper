@@ -20,7 +20,7 @@ class number_of_elements_at_least(object):
 
 class Scraper(Thread):
 
-    def __init__(self, headless, checkpoint, folder, time, query, wait=200):
+    def __init__(self, headless, checkpoint, folder, time, query, wait=1000):
         Thread.__init__(self)
 
         options = webdriver.ChromeOptions()
@@ -67,6 +67,7 @@ class Scraper(Thread):
     def save_pages(self, numel):
         i = 0
         while i+1 < len(self.iterator):
+            time.sleep(self.wait*(1+random.random())/1000)
             try:
                 links = WebDriverWait(self.driver, 10).until(
                     number_of_elements_at_least((By.CSS_SELECTOR, 'td'), numel)
@@ -88,12 +89,14 @@ class Scraper(Thread):
 
                         self.write_file(directory, filename, text)
 
+                        time.sleep(self.wait*(1+random.random())/1000)
                         self.driver.back()
                         self.driver.switch_to_frame('main')
 
             except:
                 self.driver.quit()
                 return False
+
 
         return True
 
@@ -103,7 +106,7 @@ class Scraper(Thread):
         return '/'.join([self.folder,year,month,day])
 
     def write_checkpoint(self):
-        with open(str(self.query) + '.txt', 'ab') as f:
+        with open(str(self.time) + '.txt', 'ab') as f:
             f.write((str(self.pages)+'\n').encode('utf-8'))
 
     def write_file(self, directory, filename, text):
