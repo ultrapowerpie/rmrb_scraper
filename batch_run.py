@@ -13,7 +13,7 @@ parser.add_argument('--query', default='南朝鲜 + 韩国 + 日本 + 台湾', t
     help='the keyword query to search for (default: 南朝鲜 + 韩国 + 日本 + 台湾)')
 parser.add_argument('--maxworkers', default='1', type=int,
     help='maximum number of workers we can run at once (default: 1)')
-parser.add_argument('--wait', default='1000', type=float,
+parser.add_argument('--wait', default='300', type=float,
     help='milliseconds to wait for between requests')
 
 args = parser.parse_args()

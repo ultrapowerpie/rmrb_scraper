@@ -66,17 +66,17 @@ class Scraper(Thread):
 
     def save_pages(self, numel):
         i = 0
-        while i+1 < len(self.iterator):
+        while i < len(self.iterator):
             time.sleep(self.wait*(1+random.random())/1000)
             try:
-                links = WebDriverWait(self.driver, 10).until(
+                links = WebDriverWait(self.driver, 20).until(
                     number_of_elements_at_least((By.CSS_SELECTOR, 'td'), numel)
                 )
                 link = links[self.iterator[i]].find_element_by_css_selector('a')
                 i += 1
                 if link.text:
                         link.click()
-                        WebDriverWait(self.driver, 10).until(
+                        WebDriverWait(self.driver, 20).until(
                             EC.presence_of_element_located((By.CSS_SELECTOR, '[href="javascript:GoToPDF()"]'))
                         )
                         paragraphs = self.driver.find_elements_by_css_selector('p')
@@ -118,7 +118,7 @@ class Scraper(Thread):
 
     def go_to_next_page(self):
         try:
-            imgs = WebDriverWait(self.driver, 10).until(
+            imgs = WebDriverWait(self.driver, 20).until(
                 number_of_elements_at_least((By.CSS_SELECTOR, '[alt]'), 4)
             )
             next_page = imgs[3]
@@ -133,7 +133,7 @@ class Scraper(Thread):
 
     def skip_pages(self):
         try:
-            button = WebDriverWait(self.driver, 10).until(
+            button = WebDriverWait(self.driver, 20).until(
                 EC.presence_of_element_located((By.LINK_TEXT, '>'))
             )
             button.click()
